@@ -35,11 +35,10 @@ class Register extends Component {
       errors.forEach(({ path, message }) => {
         err[`${path}Error`] = message;
       });
-      console.log(err);
+      //console.log(err);
       this.setState(err);
     }
-
-    console.log(response);
+    //console.log(response);
   };
 
   updateCredentials = (e) => {
@@ -94,7 +93,7 @@ class Register extends Component {
         />
         <Button onClick={this.register}>Submit</Button>
         { (usernameError || emailError || passwordError)
-          ? <Message error header="Please fix the following form error: " list={errorList}/>
+          ? <Message error header="Please fix the following form error(s): " list={errorList}/>
           : null
         }
       </Container>
