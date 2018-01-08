@@ -4,7 +4,6 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
 class Register extends Component {
-
   state = {
     username: '',
     usernameError: '',
@@ -19,7 +18,7 @@ class Register extends Component {
       usernameError: '',
       emailError: '',
       passwordError: '',
-    })
+    });
 
     const { username, email, password } = this.state;
     const response = await this.props.mutate({
@@ -35,10 +34,10 @@ class Register extends Component {
       errors.forEach(({ path, message }) => {
         err[`${path}Error`] = message;
       });
-      //console.log(err);
+      // console.log(err);
       this.setState(err);
     }
-    //console.log(response);
+    // console.log(response);
   };
 
   updateCredentials = (e) => {
@@ -47,53 +46,54 @@ class Register extends Component {
   };
 
   render() {
-
-    const { username, email, password, usernameError, emailError, passwordError } = this.state;
+    const {
+      username, email, password, usernameError, emailError, passwordError,
+    } = this.state;
     const errorList = [];
-    
-    if (usernameError){
+
+    if (usernameError) {
       errorList.push(usernameError);
     }
 
-    if (emailError){
+    if (emailError) {
       errorList.push(emailError);
     }
 
-    if (passwordError){
+    if (passwordError) {
       errorList.push(passwordError);
     }
 
     return (
       <Container>
         <Header as="h2">Register</Header>
-        <Input 
+        <Input
           error={!!usernameError}
-          name="username" 
-          onChange={this.updateCredentials} 
-          value={username} 
-          placeholder="username" 
-          fluid 
+          name="username"
+          onChange={this.updateCredentials}
+          value={username}
+          placeholder="username"
+          fluid
         />
         <Input
-          error={!!emailError} 
-          name="email" 
-          onChange={this.updateCredentials} 
-          value={email} 
-          placeholder="email" 
-          fluid 
+          error={!!emailError}
+          name="email"
+          onChange={this.updateCredentials}
+          value={email}
+          placeholder="email"
+          fluid
         />
-        <Input 
+        <Input
           error={!!passwordError}
-          name="password" 
-          onChange={this.updateCredentials} 
-          value={password} 
-          type="password" 
-          placeholder="password" 
-          fluid 
+          name="password"
+          onChange={this.updateCredentials}
+          value={password}
+          type="password"
+          placeholder="password"
+          fluid
         />
         <Button onClick={this.register}>Submit</Button>
         { (usernameError || emailError || passwordError)
-          ? <Message error header="Please fix the following form error(s): " list={errorList}/>
+          ? <Message error header="Please fix the following form error(s): " list={errorList} />
           : null
         }
       </Container>

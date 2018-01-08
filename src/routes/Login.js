@@ -17,16 +17,16 @@ class Login extends Component {
 
   login = async () => {
     const { email, password } = this;
-    const response = await this.props.mutate({ 
+    const response = await this.props.mutate({
       variables: { email, password },
     });
     console.log(response);
-    
+
     const { ok, token, refreshToken } = response.data.login;
 
     if (ok) {
       localStorage.setItem('token', token);
-      localStorage.setItem('refreshToken', refreshToken);      
+      localStorage.setItem('refreshToken', refreshToken);
     }
   }
 
