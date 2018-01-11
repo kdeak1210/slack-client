@@ -62,7 +62,7 @@ class CreateTeam extends Component {
               fluid
             />
           </Form.Field>
-          <Button onClick={this.login}>Create</Button>
+          <Button onClick={this.onSubmit}>Create</Button>
         </Form>
         { (errorList.length)
           ? <Message error header="Please fix the following form error(s): " list={errorList} />

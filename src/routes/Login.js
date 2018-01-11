@@ -12,9 +12,7 @@ class Login extends Component {
     extendObservable(this, {
       email: '',
       password: '',
-      errors: {
-
-      },
+      errors: {},
     });
   }
 
