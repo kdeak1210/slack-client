@@ -3,23 +3,26 @@ import React from 'react';
 import AppLayout from '../components/AppLayout';
 import Channels from '../components/Channels';
 import Header from '../components/Header';
-import Input from '../components/Input';
 import Messages from '../components/Messages';
+import SendMessage from '../components/SendMessage';
 import Teams from '../components/Teams';
 
 export default () => (
   <AppLayout>
-    <Teams>Teams</Teams>
-    <Channels>Channels</Channels>
-    <Header>Header</Header>
+    <Teams teams={[{ id: 1, letter: 'T' }, { id: 2, letter: 'Q' }]} />
+    <Channels
+      teamName="Team name"
+      username="Username"
+      channels={[{ id: 1, name: 'general' }, { id: 2, name: 'random' }]}
+      users={[{ id: 1, name: 'slackbot' }, { id: 2, name: 'user1' }]}
+    />
+    <Header channelName="general" />
     <Messages>
       <ul className="message-list">
         <li />
         <li />
       </ul>
     </Messages>
-    <Input className="input">
-      <input type="text" placeholder="Type a Message..." />
-    </Input>
+    <SendMessage channelName="general" />
   </AppLayout>
 );
