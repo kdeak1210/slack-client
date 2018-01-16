@@ -27,7 +27,6 @@ class Sidebar extends Component {
       return null;
     }
 
-
     // Find the index of allTeams where 'id' is = to currentTeamId
     const teamIndex = currentTeamId ? findIndex(allTeams, ['id', parseInt(currentTeamId, 10)]) : 0;
     const team = allTeams[teamIndex];
@@ -54,6 +53,7 @@ class Sidebar extends Component {
           onAddChannelClick={this.handleAddChannelClick}
         />
         <AddChannelModal
+          teamId={currentTeamId}
           open={this.state.openAddChannelModal}
           onClose={this.handleCloseAddChannelModal}
         />
