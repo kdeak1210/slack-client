@@ -7,7 +7,6 @@ export const allTeamsQuery = gql`
       name
       channels {
         id
-        public
         name
       }
     }

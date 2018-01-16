@@ -69,8 +69,8 @@ export default compose(
             ok: true,
             channel: {
               __typename: 'Channel',
-              id: -1,
-              name: values.name,
+              id: -1, // dont know id yet
+              name: values.name, // DO know what name will be
             },
           },
         },
