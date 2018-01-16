@@ -3,7 +3,8 @@ import { extendObservable } from 'mobx';
 import { observer } from 'mobx-react';
 import { Button, Container, Form, Header, Input, Message } from 'semantic-ui-react';
 import { graphql } from 'react-apollo';
-import gql from 'graphql-tag';
+
+import { createTeamMutation } from '../graphql/team';
 
 class CreateTeam extends Component {
   constructor(props) {
@@ -81,20 +82,5 @@ class CreateTeam extends Component {
     );
   }
 }
-
-const createTeamMutation = gql`
-  mutation ($name: String!) {
-    createTeam(name: $name) {
-      ok
-      team {
-        id
-      }
-      errors {
-        path
-        message
-      }
-    }
-  }
-`;
 
 export default graphql(createTeamMutation)(observer(CreateTeam));
