@@ -1,6 +1,7 @@
 import React from 'react';
 import { graphql } from 'react-apollo';
 import findIndex from 'lodash/findIndex';
+import { Redirect } from 'react-router-dom';
 
 import AppLayout from '../components/AppLayout';
 import Header from '../components/Header';
@@ -14,9 +15,16 @@ const ViewTeam = ({ data: { loading, allTeams }, match: { params: { teamId, chan
     return null;
   }
 
-  const teamIndex = teamId ? findIndex(allTeams, ['id', parseInt(teamId, 10)]) : 0;
+  if (!allTeams.length) {
+    return <Redirect to="/create-team" />;
+  }
+
+  const teamIdInteger = parseInt(teamId, 10);
+  const teamIndex = teamIdInteger ? findIndex(allTeams, ['id', teamIdInteger]) : 0;
   const team = allTeams[teamIndex];
-  const channelIndex = channelId ? findIndex(team.channels, ['id', parseInt(channelId, 10)]) : 0;
+
+  const channelIdInteger = parseInt(channelId, 10);
+  const channelIndex = channelIdInteger ? findIndex(team.channels, ['id', channelIdInteger]) : 0;
   const channel = team.channels[channelIndex];
 
   return (
@@ -28,14 +36,18 @@ const ViewTeam = ({ data: { loading, allTeams }, match: { params: { teamId, chan
         }))}
         team={team}
       />
-      <Header channelName={channel.name} />
-      <Messages channelId={channel.id} >
-        <ul className="message-list">
-          <li />
-          <li />
-        </ul>
-      </Messages>
-      <SendMessage channelName={channel.name} />
+      {channel && (
+        <React.Fragment>
+          <Header channelName={channel.name} />
+          <Messages channelId={channel.id} >
+            <ul className="message-list">
+              <li />
+              <li />
+            </ul>
+          </Messages>
+          <SendMessage channelName={channel.name} />
+        </React.Fragment>
+      )}
     </AppLayout>
   );
 };
