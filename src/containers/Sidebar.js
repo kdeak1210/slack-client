@@ -12,20 +12,18 @@ export default class Sidebar extends Component {
     openInviteModal: false,
   }
 
-  handleCloseAddChannelModal = () => {
-    this.setState({ openAddChannelModal: false });
+  toggleAddChannelModal = (e) => {
+    if (e) {
+      e.preventDefault();
+    }
+    this.setState(state => ({ openAddChannelModal: !state.openAddChannelModal }));
   }
 
-  handleAddChannelClick = () => {
-    this.setState({ openAddChannelModal: true });
-  }
-
-  handleInviteClick = () => {
-    this.setState({ openInviteModal: true });
-  }
-
-  handleCloseInviteModal = () => {
-    this.setState({ openInviteModal: false });
+  toggleInviteModal = (e) => {
+    if (e) {
+      e.preventDefault();
+    }
+    this.setState(state => ({ openInviteModal: !state.openInviteModal }));
   }
 
   render() {
@@ -49,18 +47,18 @@ export default class Sidebar extends Component {
           username={username}
           channels={team.channels}
           users={[{ id: 1, name: 'slackbot' }, { id: 2, name: 'user1' }]}
-          onAddChannelClick={this.handleAddChannelClick}
-          onInviteClick={this.handleInviteClick}
+          onAddChannelClick={this.toggleAddChannelModal}
+          onInviteClick={this.toggleInviteModal}
         />
         <AddChannelModal
           teamId={team.id}
           open={openAddChannelModal}
-          onClose={this.handleCloseAddChannelModal}
+          onClose={this.toggleAddChannelModal}
         />
         <InviteModal
           teamId={team.id}
           open={openInviteModal}
-          onClose={this.handleCloseInviteModal}
+          onClose={this.toggleInviteModal}
         />
       </React.Fragment>
     );

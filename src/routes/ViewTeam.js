@@ -21,11 +21,11 @@ const ViewTeam = ({ data: { loading, allTeams }, match: { params: { teamId, chan
 
   const teamIdInteger = parseInt(teamId, 10);
   const teamIndex = teamIdInteger ? findIndex(allTeams, ['id', teamIdInteger]) : 0;
-  const team = allTeams[teamIndex];
+  const team = teamIndex === -1 ? allTeams[0] : allTeams[teamIndex];
 
   const channelIdInteger = parseInt(channelId, 10);
   const channelIndex = channelIdInteger ? findIndex(team.channels, ['id', channelIdInteger]) : 0;
-  const channel = team.channels[channelIndex];
+  const channel = channelIndex === -1 ? team.channels[0] : team.channels[channelIndex];
 
   return (
     <AppLayout>
