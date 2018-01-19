@@ -31,11 +31,14 @@ export default class Sidebar extends Component {
     const { openAddChannelModal, openInviteModal } = this.state;
 
     let username = '';
+    let isOwner = false;
+
     try {
       const token = localStorage.getItem('token');
       const { user } = decode(token);
       // eslint-disable-next-line prefer-destructuring
       username = user.username;
+      isOwner = (user.id === team.owner);
     } catch (err) {}
 
     return (
@@ -46,6 +49,7 @@ export default class Sidebar extends Component {
           teamId={team.id}
           username={username}
           channels={team.channels}
+          isOwner={isOwner}
           users={[{ id: 1, name: 'slackbot' }, { id: 2, name: 'user1' }]}
           onAddChannelClick={this.toggleAddChannelModal}
           onInviteClick={this.toggleInviteModal}
