@@ -50,7 +50,7 @@ const ViewTeam = ({
               <li />
             </ul>
           </Messages>
-          <SendMessage channelName={channel.name} />
+          <SendMessage channelName={channel.name} channelId={channel.id} />
         </React.Fragment>
       )}
     </AppLayout>
