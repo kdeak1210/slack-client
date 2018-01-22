@@ -5,28 +5,24 @@ import gql from 'graphql-tag';
 
 import Messages from '../components/Messages';
 
-const Message = ({
-  id, text, created_at, user: { username },
-}) => (
-  <Comment key={`message-${id}`}>
-    <Comment.Avatar src="/assets/images/avatar/small/matt.jpg" />
-    <Comment.Content>
-      <Comment.Author as="a">{ username }</Comment.Author>
-      <Comment.Metadata>
-        <div>{ created_at }</div>
-      </Comment.Metadata>
-      <Comment.Text>{ text }</Comment.Text>
-      <Comment.Actions>
-        <Comment.Action>Reply</Comment.Action>
-      </Comment.Actions>
-    </Comment.Content>
-  </Comment>
-);
-
 const MessageContainer = ({ data: { loading, messages } }) => (loading ? null : (
   <Messages>
     <Comment.Group>
-      {messages.map(m => Message(m))}
+      {messages.map(m => (
+        <Comment key={`message-${m.id}`}>
+          <Comment.Avatar src="/assets/images/avatar/small/matt.jpg" />
+          <Comment.Content>
+            <Comment.Author as="a">{ m.user.username }</Comment.Author>
+            <Comment.Metadata>
+              <div>{ m.created_at }</div>
+            </Comment.Metadata>
+            <Comment.Text>{ m.text }</Comment.Text>
+            <Comment.Actions>
+              <Comment.Action>Reply</Comment.Action>
+            </Comment.Actions>
+          </Comment.Content>
+        </Comment>
+      ))}
     </Comment.Group>
   </Messages>
 ));
