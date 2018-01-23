@@ -42,7 +42,7 @@ class MessageContainer extends Component {
   /** Subscribes the component to a gql subscription
    * Note, subscribeToMore apollo data prop returns an unsubscribe function
    */
-  subscribe = (channelId) =>
+  subscribe = channelId =>
     this.props.data.subscribeToMore({
       document: newChannelMessageSubscription,
       variables: {
@@ -60,7 +60,7 @@ class MessageContainer extends Component {
     });
 
   render() {
-    const { data: { messages, loading }} = this.props;
+    const { data: { messages, loading } } = this.props;
     return loading ? null : (
       <Messages>
         <Comment.Group>
@@ -81,7 +81,7 @@ class MessageContainer extends Component {
           ))}
         </Comment.Group>
       </Messages>
-    )
+    );
   }
 }
 
@@ -103,6 +103,6 @@ export default graphql(messagesQuery, {
     channelId: props.channelId,
   }),
   options: {
-    fetchPolicy: 'network-only' // won't cache this query.
+    fetchPolicy: 'network-only', // won't cache this query.
   },
 })(MessageContainer);
