@@ -19,11 +19,34 @@ const newChannelMessageSubscription = gql`
 `;
 
 class MessageContainer extends Component {
-  componentWillMount(){
+  componentWillMount() {
+    this.unsubscribe = this.subscribe(this.props.channelId);
+  }
+
+  // Lifecycle method called when component gets new props
+  componentWillReceiveProps({ channelId }) {
+    if (this.props.channelId !== channelId) {
+      if (this.unsubscribe) {
+        this.unsubscribe();
+      }
+      this.unsubscribe = this.subscribe(channelId);
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+  }
+
+  /** Subscribes the component to a gql subscription
+   * Note, subscribeToMore apollo data prop returns an unsubscribe function
+   */
+  subscribe = (channelId) =>
     this.props.data.subscribeToMore({
       document: newChannelMessageSubscription,
       variables: {
-        channelId: this.props.channelId,
+        channelId,
       },
       updateQuery: (prev, { subscriptionData }) => {
         if (!subscriptionData.data) {
@@ -31,13 +54,12 @@ class MessageContainer extends Component {
         }
         return {
           ...prev,
-          messages: [...prev.messages, subscriptionData.data.newChannelMessage]
+          messages: [...prev.messages, subscriptionData.data.newChannelMessage],
         };
       },
     });
-  }
 
-  render(){
+  render() {
     const { data: { messages, loading }} = this.props;
     return loading ? null : (
       <Messages>
@@ -80,4 +102,7 @@ export default graphql(messagesQuery, {
   variables: props => ({
     channelId: props.channelId,
   }),
+  options: {
+    fetchPolicy: 'network-only' // won't cache this query.
+  },
 })(MessageContainer);

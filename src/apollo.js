@@ -60,7 +60,7 @@ const link = split(
   },
   wsLink,
   httpLinkWithMiddleware,
-)
+);
 
 export default new ApolloClient({
   link,
