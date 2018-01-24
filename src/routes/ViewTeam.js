@@ -18,8 +18,7 @@ const ViewTeam = ({
     return null;
   }
 
-  console.log(me);
-  const { teams } = me;
+  const { teams, username } = me;
 
   if (!teams.length) {
     return <Redirect to="/create-team" />;
@@ -41,6 +40,7 @@ const ViewTeam = ({
           letter: t.name.charAt(0).toUpperCase(),
         }))}
         team={team}
+        username={username}
       />
       {channel && (
         <React.Fragment>
