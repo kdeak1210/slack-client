@@ -5,7 +5,7 @@ import gql from 'graphql-tag';
 import { compose, graphql } from 'react-apollo';
 import findIndex from 'lodash/findIndex';
 
-import { allTeamsQuery } from '../graphql/team';
+import { meQuery } from '../graphql/team';
 
 const AddChannelModal = ({
   open,
@@ -81,12 +81,12 @@ export default compose(
           }
 
           // Read the data from our cache for this query.
-          const data = proxy.readQuery({ query: allTeamsQuery });
+          const data = proxy.readQuery({ query: meQuery });
           // Add our channel from the mutation to the end of our team's channel.
-          const teamIndex = findIndex(data.allTeams, ['id', teamId]);
-          data.allTeams[teamIndex].channels.push(channel);
+          const teamIndex = findIndex(data.me.teams, ['id', teamId]);
+          data.me.teams[teamIndex].channels.push(channel);
           // Write our data back to the cache.
-          proxy.writeQuery({ query: allTeamsQuery, data });
+          proxy.writeQuery({ query: meQuery, data });
         },
       });
       onClose();
