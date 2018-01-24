@@ -2,8 +2,6 @@ import React from 'react';
 import styled from 'styled-components';
 import { Input } from 'semantic-ui-react';
 import { withFormik } from 'formik';
-import { compose, graphql } from 'react-apollo';
-import gql from 'graphql-tag';
 
 const SendMessageWrapper = styled.div`
   grid-column: 3;
@@ -14,7 +12,7 @@ const SendMessageWrapper = styled.div`
 const ENTER_KEY = 13;
 
 const SendMessage = ({
-  channelName,
+  placeholder,
   values,
   handleChange,
   handleBlur,
@@ -32,32 +30,21 @@ const SendMessage = ({
       onBlur={handleBlur}
       name="message"
       value={values.message}
-      placeholder={`Message #${channelName}`}
+      placeholder={`Message #${placeholder}`}
       fluid
     />
   </SendMessageWrapper>
 );
 
-const createMessageMutation = gql`
-  mutation($channelId: Int!, $text: String!) {
-    createMessage(channelId: $channelId, text: $text)
-  }
-`;
+export default withFormik({
+  mapPropsToValues: () => ({ message: '' }),
+  handleSubmit: async (values, { props: { onSubmit }, setSubmitting, resetForm }) => {
+    if (!values.message || !values.message.trim()) {
+      setSubmitting(false);
+      return;
+    }
 
-export default compose(
-  graphql(createMessageMutation),
-  withFormik({
-    mapPropsToValues: () => ({ message: '' }),
-    handleSubmit: async (values, { props: { channelId, mutate }, setSubmitting, resetForm }) => {
-      if (!values.message || !values.message.trim()) {
-        setSubmitting(false);
-        return;
-      }
-
-      await mutate({
-        variables: { channelId, text: values.message },
-      });
-      resetForm();
-    },
-  }),
-)(SendMessage);
+    await onSubmit(values.message);
+    resetForm();
+  },
+})(SendMessage);
