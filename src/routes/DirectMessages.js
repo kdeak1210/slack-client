@@ -52,6 +52,7 @@ const DirectMessage = ({
                 teamId,
               },
             });
+            console.log(response);
           }}
         />
       </React.Fragment>
