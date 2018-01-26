@@ -47,7 +47,7 @@ export default class Sidebar extends Component {
           username={username}
           channels={team.channels}
           isOwner={team.admin}
-          users={[{ id: 1, name: 'slackbot' }, { id: 2, name: 'user1' }]}
+          users={team.directMessageMembers}
           onAddChannelClick={this.toggleAddChannelModal}
           onInviteClick={this.toggleInviteModal}
           onDirectMessageClick={this.toggleDirectMessageModal}

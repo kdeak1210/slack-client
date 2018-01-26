@@ -12,7 +12,8 @@ import DirectMessageContainer from '../containers/DirectMessageContainer';
 import { meQuery } from '../graphql/team';
 
 const DirectMessage = ({
-  data: { mutate, loading, me },
+  mutate,
+  data: { loading, me },
   match: { params: { teamId, userId } },
 }) => {
   if (loading) {
@@ -39,24 +40,21 @@ const DirectMessage = ({
         team={team}
         username={username}
       />
-      <React.Fragment>
-        <Header channelName="username placeholder" />
-        <DirectMessageContainer teamId={teamId} userId={userId} />
-        <SendMessage
-          placeholder={userId}
-          onSubmit={async (text) => {
-            const response = await mutate({
-              variables: {
-                text,
-                receiverId: userId,
-                teamId,
-              },
-            });
-            console.log(response);
-          }}
-        />
-      </React.Fragment>
-
+      <Header channelName="username placeholder" />
+      <DirectMessageContainer teamId={teamId} userId={userId} />
+      <SendMessage
+        placeholder={userId}
+        onSubmit={async (text) => {
+          const response = await mutate({
+            variables: {
+              text,
+              receiverId: userId,
+              teamId,
+            },
+          });
+          console.log(response);
+        }}
+      />
     </AppLayout>
   );
 };
