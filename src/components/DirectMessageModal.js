@@ -13,13 +13,14 @@ const DirectMessageModal = ({
   history,
 }) => (
   <Modal open={open} onClose={onClose} >
-    <Modal.Header>Add a Channel</Modal.Header>
+    <Modal.Header>Direct Message a Team Member</Modal.Header>
     <Modal.Content>
       <Form>
         <Form.Field>
           {/* <Input name="name" fluid placeholder="Search users" /> */}
           {!loading && (
             <Downshift
+              itemToString={item => item.username}
               onChange={(selectedUser) => {
                 history.push(`/view-team/user/${teamId}/${selectedUser.id}`);
                 onClose();
