@@ -5,44 +5,58 @@ import gql from 'graphql-tag';
 
 import Messages from '../components/Messages';
 
-// eslint-disable-next-line react/prefer-stateless-function
+const newDirectMessageSubscription = gql`
+  subscription ($teamId: Int!, $userId: Int!) {
+    newDirectMessage(teamId: $teamId, userId: $userId) {
+      id
+      sender {
+        username
+      }
+      text
+      created_at
+    }
+  }
+`;
+
 class DirectMessageContainer extends Component {
-  // componentWillMount() {
-  //   this.unsubscribe = this.subscribe(this.props.channelId);
-  // }
+  componentWillMount() {
+    this.unsubscribe = this.subscribe(this.props.teamId, this.props.userId);
+  }
 
-  // // Lifecycle method called when component gets new props
-  // componentWillReceiveProps({ channelId }) {
-  //   if (this.props.channelId !== channelId) {
-  //     if (this.unsubscribe) {
-  //       this.unsubscribe();
-  //     }
-  //     this.unsubscribe = this.subscribe(channelId);
-  //   }
-  // }
+  // Lifecycle method called when component gets new props
+  componentWillReceiveProps({ teamId, userId }) {
+    if (this.props.teamId !== teamId || this.props.userId !== userId) {
+      // One of the id's changed (navigated away from DM), unsubscribe
+      if (this.unsubscribe) {
+        this.unsubscribe();
+      }
+      this.unsubscribe = this.subscribe(this.props.teamId, this.props.userId);
+    }
+  }
 
-  // componentWillUnmount() {
-  //   if (this.unsubscribe) {
-  //     this.unsubscribe();
-  //   }
-  // }
+  componentWillUnmount() {
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
+  }
 
-  // subscribe = channelId =>
-  //   this.props.data.subscribeToMore({
-  //     document: newChannelMessageSubscription,
-  //     variables: {
-  //       channelId,
-  //     },
-  //     updateQuery: (prev, { subscriptionData }) => {
-  //       if (!subscriptionData.data) {
-  //         return prev;
-  //       }
-  //       return {
-  //         ...prev,
-  //         messages: [...prev.messages, subscriptionData.data.newChannelMessage],
-  //       };
-  //     },
-  //   });
+  subscribe = (teamId, userId) =>
+    this.props.data.subscribeToMore({
+      document: newDirectMessageSubscription,
+      variables: {
+        teamId,
+        userId,
+      },
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) {
+          return prev;
+        }
+        return {
+          ...prev,
+          directMessages: [...prev.directMessages, subscriptionData.data.newDirectMessage],
+        };
+      },
+    });
 
   render() {
     const { data: { directMessages, loading } } = this.props;
@@ -85,11 +99,11 @@ const directMessagesQuery = gql`
 `;
 
 export default graphql(directMessagesQuery, {
-  variables: props => ({
-    teamId: props.teamId,
-    userId: props.userId,
-  }),
-  options: {
+  options: props => ({
     fetchPolicy: 'network-only', // won't cache this query.
-  },
+    variables: {
+      teamId: props.teamId,
+      userId: props.userId,
+    },
+  }),
 })(DirectMessageContainer);
