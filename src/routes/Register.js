@@ -28,7 +28,7 @@ class Register extends Component {
     const { ok, errors } = response.data.register;
 
     if (ok) {
-      this.props.history.push('/'); // Redirect them Home
+      this.props.history.push('/login'); // Redirect them to Login
     } else {
       const err = {};
       errors.forEach(({ path, message }) => {

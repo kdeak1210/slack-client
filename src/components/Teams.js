@@ -28,7 +28,9 @@ const TeamListItem = styled.li`
   font-size: 24px;
   border-radius: 11px;
   &:hover {
-    border: thick solid #767676;
+    border-style: solid;
+    border-width: thick;
+    border-color: #767676;
   }
 `;
 
@@ -40,6 +42,9 @@ const team = ({ id, letter }) => (
 
 export default ({ teams }) => (
   <TeamWrapper>
-    <TeamList>{teams.map(team)}</TeamList>
+    <TeamList>
+      {teams.map(team)}
+      <Link to="/create-team"><TeamListItem>+</TeamListItem></Link>
+    </TeamList>
   </TeamWrapper>
 );
