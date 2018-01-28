@@ -4,6 +4,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import Messages from '../components/Messages';
+import FileUpload from '../components/FileUpload';
 
 const newChannelMessageSubscription = gql`
   subscription ($channelId: Int!) {
@@ -63,23 +64,25 @@ class MessageContainer extends Component {
     const { data: { messages, loading } } = this.props;
     return loading ? null : (
       <Messages>
-        <Comment.Group>
-          {messages.map(m => (
-            <Comment key={`message-${m.id}`}>
-              <Comment.Avatar src="/assets/images/avatar/small/matt.jpg" />
-              <Comment.Content>
-                <Comment.Author as="a">{ m.user.username }</Comment.Author>
-                <Comment.Metadata>
-                  <div>{ m.created_at }</div>
-                </Comment.Metadata>
-                <Comment.Text>{ m.text }</Comment.Text>
-                <Comment.Actions>
-                  <Comment.Action>Reply</Comment.Action>
-                </Comment.Actions>
-              </Comment.Content>
-            </Comment>
-          ))}
-        </Comment.Group>
+        <FileUpload disableClick>
+          <Comment.Group>
+            {messages.map(m => (
+              <Comment key={`message-${m.id}`}>
+                {/* <Comment.Avatar src="" /> */}
+                <Comment.Content>
+                  <Comment.Author as="a">{ m.user.username }</Comment.Author>
+                  <Comment.Metadata>
+                    <div>{ m.created_at }</div>
+                  </Comment.Metadata>
+                  <Comment.Text>{ m.text }</Comment.Text>
+                  <Comment.Actions>
+                    <Comment.Action>Reply</Comment.Action>
+                  </Comment.Actions>
+                </Comment.Content>
+              </Comment>
+            ))}
+          </Comment.Group>
+        </FileUpload>
       </Messages>
     );
   }
