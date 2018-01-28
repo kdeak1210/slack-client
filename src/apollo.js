@@ -1,12 +1,13 @@
 import { ApolloClient } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
-import { createHttpLink } from 'apollo-link-http';
 import { setContext } from 'apollo-link-context';
 import { ApolloLink, split } from 'apollo-link';
 import { WebSocketLink } from 'apollo-link-ws';
 import { getMainDefinition } from 'apollo-utilities';
+import { createUploadLink } from 'apollo-upload-client';
 
-const httpLink = createHttpLink({
+// Builds on createHttpLink, adds file uploading capability
+const httpLink = createUploadLink({
   uri: 'http://localhost:8080/graphql',
 });
 
@@ -21,11 +22,11 @@ const middlewareLink = setContext(() => ({
 // Afterware runs after every gql request (refresh tokens automatically)
 const afterwareLink = new ApolloLink((operation, forward) =>
   forward(operation).map((response) => {
-    const { response: { headers } } = operation.getContext();
+    const { headers } = operation.getContext();
 
     if (headers) {
-      const token = headers.get('x-token');
-      const refreshToken = headers.get('x-refresh-token');
+      const token = headers['x-token'];
+      const refreshToken = headers['x-refresh-token'];
 
       if (token) {
         localStorage.setItem('token', token);
