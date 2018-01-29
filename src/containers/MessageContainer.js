@@ -4,6 +4,7 @@ import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
 import FileUpload from '../components/FileUpload';
+import RenderText from '../components/RenderText';
 
 const newChannelMessageSubscription = gql`
   subscription ($channelId: Int!) {
@@ -13,6 +14,8 @@ const newChannelMessageSubscription = gql`
       user {
         username
       }
+      url
+      mimetype
       created_at
     }
   }
@@ -28,6 +31,25 @@ const localStyle = {
     flexDirection: 'column-reverse',
     overflowY: 'auto',
   },
+};
+
+const Message = ({ message: { url, text, mimetype } }) => {
+  if (url) {
+    if (mimetype.startsWith('image/')) {
+      return <img src={url} alt="Uploaded File" />;
+    } else if (mimetype === 'text/plain') {
+      return <RenderText url={url} />;
+    } else if (mimetype.startsWith('audio/')) {
+      return (
+        <div>
+          <audio controls>
+            <source src={url} type={mimetype} />
+          </audio>
+        </div>
+      );
+    }
+  }
+  return <Comment.Text>{text}</Comment.Text>;
 };
 
 class MessageContainer extends Component {
@@ -89,7 +111,7 @@ class MessageContainer extends Component {
                 <Comment.Metadata>
                   <div>{ m.created_at }</div>
                 </Comment.Metadata>
-                <Comment.Text>{ m.text }</Comment.Text>
+                <Message message={m} />
                 <Comment.Actions>
                   <Comment.Action>Reply</Comment.Action>
                 </Comment.Actions>
@@ -111,6 +133,8 @@ const messagesQuery = gql`
       user {
         username
       }
+      url
+      mimetype
       created_at
     }
   }
