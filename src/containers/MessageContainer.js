@@ -3,7 +3,6 @@ import { Comment } from 'semantic-ui-react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
-import Messages from '../components/Messages';
 import FileUpload from '../components/FileUpload';
 
 const newChannelMessageSubscription = gql`
@@ -18,6 +17,18 @@ const newChannelMessageSubscription = gql`
     }
   }
 `;
+
+const localStyle = {
+  fileUpload: {
+    gridColumn: 3,
+    gridRow: 2,
+    paddingLeft: '20px',
+    paddingRight: '20px',
+    display: 'flex',
+    flexDirection: 'column-reverse',
+    overflowY: 'auto',
+  },
+};
 
 class MessageContainer extends Component {
   componentWillMount() {
@@ -63,27 +74,31 @@ class MessageContainer extends Component {
   render() {
     const { data: { messages, loading }, channelId } = this.props;
     return loading ? null : (
-      <Messages>
-        <FileUpload channelId={channelId} disableClick>
-          <Comment.Group>
-            {messages.map(m => (
-              <Comment key={`message-${m.id}`}>
-                {/* <Comment.Avatar src="" /> */}
-                <Comment.Content>
-                  <Comment.Author as="a">{ m.user.username }</Comment.Author>
-                  <Comment.Metadata>
-                    <div>{ m.created_at }</div>
-                  </Comment.Metadata>
-                  <Comment.Text>{ m.text }</Comment.Text>
-                  <Comment.Actions>
-                    <Comment.Action>Reply</Comment.Action>
-                  </Comment.Actions>
-                </Comment.Content>
-              </Comment>
+
+      <FileUpload
+        style={localStyle.fileUpload}
+        channelId={channelId}
+        disableClick
+      >
+        <Comment.Group>
+          {messages.map(m => (
+            <Comment key={`message-${m.id}`}>
+              {/* <Comment.Avatar src="" /> */}
+              <Comment.Content>
+                <Comment.Author as="a">{ m.user.username }</Comment.Author>
+                <Comment.Metadata>
+                  <div>{ m.created_at }</div>
+                </Comment.Metadata>
+                <Comment.Text>{ m.text }</Comment.Text>
+                <Comment.Actions>
+                  <Comment.Action>Reply</Comment.Action>
+                </Comment.Actions>
+              </Comment.Content>
+            </Comment>
             ))}
-          </Comment.Group>
-        </FileUpload>
-      </Messages>
+        </Comment.Group>
+      </FileUpload>
+
     );
   }
 }
