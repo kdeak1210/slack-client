@@ -2,8 +2,9 @@ import React from 'react';
 import { Button, Form, Input, Modal } from 'semantic-ui-react';
 import Downshift from 'downshift';
 import { withRouter } from 'react-router-dom';
-import gql from 'graphql-tag';
 import { graphql } from 'react-apollo';
+
+import { teamMembersQuery } from '../graphql/team';
 
 const DirectMessageModal = ({
   open,
@@ -20,7 +21,7 @@ const DirectMessageModal = ({
           {/* <Input name="name" fluid placeholder="Search users" /> */}
           {!loading && (
             <Downshift
-              itemToString={item => item.username}
+              itemToString={item => (item ? item.username : '')}
               onChange={(selectedUser) => {
                 history.push(`/view-team/user/${teamId}/${selectedUser.id}`);
                 onClose();
@@ -68,14 +69,5 @@ const DirectMessageModal = ({
     </Modal.Content>
   </Modal>
 );
-
-const teamMembersQuery = gql`
-  query ($teamId: Int!) {
-    teamMembers(teamId: $teamId) {
-      id
-      username
-    }
-  }
-`;
 
 export default withRouter(graphql(teamMembersQuery)(DirectMessageModal));

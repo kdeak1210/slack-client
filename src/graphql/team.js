@@ -36,3 +36,12 @@ export const createTeamMutation = gql`
     }
   }
 `;
+
+export const teamMembersQuery = gql`
+  query ($teamId: Int!) {
+    teamMembers(teamId: $teamId) {
+      id
+      username
+    }
+  }
+`;
