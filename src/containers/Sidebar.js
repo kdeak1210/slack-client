@@ -35,7 +35,9 @@ export default class Sidebar extends Component {
   }
 
   render() {
-    const { teams, team, username } = this.props;
+    const {
+      teams, team, username, currentUserId,
+    } = this.props;
     const { openAddChannelModal, openInviteModal, openDirectMessageModal } = this.state;
 
     return (
@@ -56,6 +58,7 @@ export default class Sidebar extends Component {
           teamId={team.id}
           open={openAddChannelModal}
           onClose={this.toggleAddChannelModal}
+          currentUserId={currentUserId}
         />
         <InviteModal
           teamId={team.id}
