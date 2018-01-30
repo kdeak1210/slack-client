@@ -1,73 +1,75 @@
 import React from 'react';
-import { Button, Form, Input, Modal } from 'semantic-ui-react';
-import Downshift from 'downshift';
+import { Button, Form, Modal } from 'semantic-ui-react';
 import { withRouter } from 'react-router-dom';
-import { graphql } from 'react-apollo';
+import { withFormik } from 'formik';
+import { graphql, compose } from 'react-apollo';
+import gql from 'graphql-tag';
 
-import { teamMembersQuery } from '../graphql/team';
+import MultiSelectUsers from './MultiSelectUsers';
 
 const DirectMessageModal = ({
   open,
   onClose,
   teamId,
-  data: { loading, teamMembers },
-  history,
+  currentUserId,
+  values,
+  handleChange,
+  handleBlur,
+  handleSubmit,
+  isSubmitting,
+  resetForm,
+  setFieldValue,
 }) => (
   <Modal open={open} onClose={onClose} >
     <Modal.Header>Direct Message a Team Member</Modal.Header>
     <Modal.Content>
       <Form>
         <Form.Field>
-          {/* <Input name="name" fluid placeholder="Search users" /> */}
-          {!loading && (
-            <Downshift
-              itemToString={item => (item ? item.username : '')}
-              onChange={(selectedUser) => {
-                history.push(`/view-team/user/${teamId}/${selectedUser.id}`);
-                onClose();
-              }}
-              render={({
-                getInputProps,
-                getItemProps,
-                isOpen,
-                inputValue,
-                selectedItem,
-                highlightedIndex,
-              }) => (
-                <div>
-                  <Input fluid {...getInputProps({ placeholder: 'Username of person to message?' })} />
-                  {isOpen ? (
-                    <div style={{ border: '1px solid #ccc' }}>
-                      {teamMembers
-                        .filter(i =>
-                            !inputValue ||
-                            i.username.toLowerCase().includes(inputValue.toLowerCase()))
-                        .map((item, index) => (
-                          <div
-                            {...getItemProps({ item })}
-                            key={item.id}
-                            style={{
-                              backgroundColor:
-                                highlightedIndex === index ? 'gray' : 'white',
-                              fontWeight: selectedItem === item ? 'bold' : 'normal',
-                            }}
-                          >
-                            {item.username}
-                          </div>
-                        ))}
-                    </div>
-                  ) : null}
-                </div>
-              )}
-            />
-          )}
+          <MultiSelectUsers
+            placeholder="select members to message"
+            value={values.members}
+            handleChange={(e, { value }) => setFieldValue('members', value)}
+            teamId={teamId}
+            currentUserId={currentUserId}
+          />
         </Form.Field>
-        <Button onClick={onClose} fluid>
-          Cancel
-        </Button>
+        <Form.Group>
+          <Button
+            disabled={isSubmitting}
+            fluid
+            onClick={(e) => {
+              resetForm();
+              onClose(e);
+            }}
+          >
+            Cancel
+          </Button>
+          <Button disabled={isSubmitting} onClick={handleSubmit} fluid>
+            Start Messaging
+          </Button>
+        </Form.Group>
       </Form>
     </Modal.Content>
   </Modal>
 );
 
-export default withRouter(graphql(teamMembersQuery)(DirectMessageModal));
+const getOrCreateChannelMutation = gql`
+  mutation($teamId: Int!, $members: [Int!]!) {
+    getOrCreateChannel(teamId: $teamId, members: $members)
+  }
+`;
+
+export default compose(
+  withRouter,
+  graphql(getOrCreateChannelMutation),
+  withFormik({
+    mapPropsToValues: () => ({ members: [] }),
+    handleSubmit: async ({ members }, { props: { onClose, teamId, mutate }, setSubmitting }) => {
+      const response = await mutate({ variables: { teamId, members } });
+      console.log(response);
+
+      onClose();
+      setSubmitting(false);
+    },
+  }),
+)(DirectMessageModal);

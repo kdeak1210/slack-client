@@ -40,6 +40,17 @@ export default class Sidebar extends Component {
     } = this.props;
     const { openAddChannelModal, openInviteModal, openDirectMessageModal } = this.state;
 
+    const regularChannels = [];
+    const dmChannels = [];
+
+    team.channels.forEach((c) => {
+      if (c.dm) {
+        dmChannels.push(c);
+      } else {
+        regularChannels.push(c);
+      }
+    });
+
     return (
       <React.Fragment>
         <Teams teams={teams} />
@@ -47,7 +58,8 @@ export default class Sidebar extends Component {
           teamName={team.name}
           teamId={team.id}
           username={username}
-          channels={team.channels}
+          channels={regularChannels}
+          dmChannels={dmChannels}
           isOwner={team.admin}
           users={team.directMessageMembers}
           onAddChannelClick={this.toggleAddChannelModal}
@@ -56,9 +68,9 @@ export default class Sidebar extends Component {
         />
         <AddChannelModal
           teamId={team.id}
+          currentUserId={currentUserId}
           open={openAddChannelModal}
           onClose={this.toggleAddChannelModal}
-          currentUserId={currentUserId}
         />
         <InviteModal
           teamId={team.id}
@@ -67,6 +79,7 @@ export default class Sidebar extends Component {
         />
         <DirectMessageModal
           teamId={team.id}
+          currentUserId={currentUserId}
           open={openDirectMessageModal}
           onClose={this.toggleDirectMessageModal}
         />
