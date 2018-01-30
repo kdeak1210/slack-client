@@ -6,7 +6,7 @@ import { graphql } from 'react-apollo';
 import { teamMembersQuery } from '../graphql/team';
 
 const MultiSelectUsers = ({
-  data: { loading, teamMembers },
+  data: { loading, teamMembers = [] },
   value,
   handleChange,
   placeholder,

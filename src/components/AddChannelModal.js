@@ -30,7 +30,7 @@ const AddChannelModal = ({
   >
     <Modal.Header>Add a Channel</Modal.Header>
     <Modal.Content>
-      <Form>
+      <Form onSubmit={handleSubmit}>
         <Form.Field>
           <Input
             value={values.name}
@@ -62,6 +62,7 @@ const AddChannelModal = ({
         )}
         <Form.Group widths="equal">
           <Button
+            type="button"
             disabled={isSubmitting}
             fluid
             onClick={() => {
@@ -71,7 +72,12 @@ const AddChannelModal = ({
           >
             Cancel
           </Button>
-          <Button disabled={isSubmitting} onClick={handleSubmit} fluid>
+          <Button
+            type="submit"
+            disabled={isSubmitting}
+            onClick={handleSubmit}
+            fluid
+          >
             Create Channel
           </Button>
         </Form.Group>
@@ -87,6 +93,7 @@ const createChannelMutation = gql`
       channel {
         id
         name
+        dm
       }
     }
   }
@@ -96,7 +103,7 @@ export default compose(
   graphql(createChannelMutation),
   withFormik({
     mapPropsToValues: () => ({ public: true, name: '', members: [] }),
-    handleSubmit: async (values, { props: { teamId, mutate, onClose }, setSubmitting }) => {
+    handleSubmit: async (values, { props: { teamId, mutate, onClose }, resetForm }) => {
       await mutate({
         variables: {
           teamId, name: values.name, public: values.public, members: values.members,
@@ -110,6 +117,7 @@ export default compose(
               __typename: 'Channel',
               id: -1, // dont know id yet
               name: values.name, // DO know what name will be
+              dm: false,
             },
           },
         },
@@ -129,7 +137,7 @@ export default compose(
         },
       });
       onClose();
-      setSubmitting(false);
+      resetForm();
     },
   }),
 )(AddChannelModal);
