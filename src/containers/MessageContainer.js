@@ -92,13 +92,13 @@ class MessageContainer extends Component {
         }
         return {
           ...prev,
-          messages: [...prev.messages, subscriptionData.data.newChannelMessage],
+          messages: [subscriptionData.data.newChannelMessage, ...prev.messages],
         };
       },
     });
 
   render() {
-    const { data: { messages, loading }, channelId } = this.props;
+    const { data: { messages, fetchMore, loading }, channelId } = this.props;
     return loading ? null : (
 
       <FileUpload
@@ -107,51 +107,55 @@ class MessageContainer extends Component {
         disableClick
       >
         <Comment.Group>
-          {this.state.hasMoreItems && (
-            <Button
-              onClick={() => {
-                // Use Apollo's fetchmore function & change the offset
-                this.props.data.fetchMore({
-                  variables: {
-                    channelId: this.props.channelId, // keep same channelId
-                    offset: this.props.data.messages.length,
-                  },
-                  // Takes previousResult, what we fetched, and combines them together
-                  updateQuery: (previousResult, { fetchMoreResult }) => {
-                    if (!fetchMoreResult) {
-                      return previousResult;
-                    }
+          {this.state.hasMoreItems &&
+            messages.length >= 35 && (
+              <Button
+                onClick={() => {
+                  // Use Apollo's fetchmore function & change the offset
+                  fetchMore({
+                    variables: {
+                      channelId, // keep same channelId
+                      cursor: messages[messages.length - 1].created_at, // date of last message
+                    },
+                    // Takes previousResult, what we fetched, and combines them together
+                    updateQuery: (previousResult, { fetchMoreResult }) => {
+                      if (!fetchMoreResult) {
+                        return previousResult;
+                      }
 
-                    if (fetchMoreResult.messages.length < 35) {
-                      // Reached end of list ex 35 35 23 0 0 0
-                      this.setState({ hasMoreItems: false });
-                    }
+                      if (fetchMoreResult.messages.length < 35) {
+                        // Reached end of list ex 35 35 23 0 0 0
+                        this.setState({ hasMoreItems: false });
+                      }
 
-                    return {
-                      ...previousResult,
-                      messages: [...previousResult.messages, ...fetchMoreResult.messages],
-                    };
-                  },
-                });
-              }}
-            >
-              Load More
-            </Button>
+                      return {
+                        ...previousResult,
+                        messages: [...previousResult.messages, ...fetchMoreResult.messages],
+                      };
+                    },
+                  });
+                }}
+              >
+                Load More
+              </Button>
           )}
-          {messages.map(m => (
-            <Comment key={`message-${m.id}`}>
-              {/* <Comment.Avatar src="" /> */}
-              <Comment.Content>
-                <Comment.Author as="a">{ m.user.username }</Comment.Author>
-                <Comment.Metadata>
-                  <div>{ m.created_at }</div>
-                </Comment.Metadata>
-                <Message message={m} />
-                <Comment.Actions>
-                  <Comment.Action>Reply</Comment.Action>
-                </Comment.Actions>
-              </Comment.Content>
-            </Comment>
+          {messages
+            .slice()
+            .reverse()
+            .map(m => (
+              <Comment key={`message-${m.id}`}>
+                {/* <Comment.Avatar src="" /> */}
+                <Comment.Content>
+                  <Comment.Author as="a">{ m.user.username }</Comment.Author>
+                  <Comment.Metadata>
+                    <div>{ m.created_at }</div>
+                  </Comment.Metadata>
+                  <Message message={m} />
+                  <Comment.Actions>
+                    <Comment.Action>Reply</Comment.Action>
+                  </Comment.Actions>
+                </Comment.Content>
+              </Comment>
             ))}
         </Comment.Group>
       </FileUpload>
@@ -160,8 +164,8 @@ class MessageContainer extends Component {
 }
 
 const messagesQuery = gql`
-  query ($offset: Int!, $channelId: Int!) {
-    messages(offset: $offset, channelId: $channelId) {
+  query ($cursor: String, $channelId: Int!) {
+    messages(cursor: $cursor, channelId: $channelId) {
       id
       text
       user {
@@ -179,7 +183,6 @@ export default graphql(messagesQuery, {
     fetchPolicy: 'network-only', // won't cache this query.
     variables: {
       channelId: props.channelId,
-      offset: 0,
     },
   }),
 })(MessageContainer);

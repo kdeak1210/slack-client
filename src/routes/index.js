@@ -14,7 +14,11 @@ const isAuthenticated = () => {
   try {
     // try to decode the token. If can't decode, then user is invalid
     decode(token);
-    decode(refreshToken);
+    const { exp } = decode(refreshToken);
+    if (Date.now() / 1000 > exp) {
+      // Current date has passed when the refresh token expired
+      return false;
+    }
   } catch (err) {
     return false;
   }
