@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Comment, Button } from 'semantic-ui-react';
+import { Comment } from 'semantic-ui-react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
 
@@ -23,6 +23,10 @@ const newChannelMessageSubscription = gql`
 
 const localStyle = {
   fileUpload: {
+    display: 'flex',
+    flexDirection: 'column-reverse',
+  },
+  wrapper: {
     gridColumn: 3,
     gridRow: 2,
     paddingLeft: '20px',
@@ -55,6 +59,7 @@ const Message = ({ message: { url, text, mimetype } }) => {
 class MessageContainer extends Component {
   state = {
     hasMoreItems: true,
+    reachedTop: false,
   }
 
   componentWillMount() {
@@ -62,12 +67,29 @@ class MessageContainer extends Component {
   }
 
   // Lifecycle method called when component gets new props
-  componentWillReceiveProps({ channelId }) {
+  componentWillReceiveProps({ data: { messages }, channelId }) {
     if (this.props.channelId !== channelId) {
       if (this.unsubscribe) {
         this.unsubscribe();
       }
       this.unsubscribe = this.subscribe(channelId);
+    }
+
+    // check for new messages (have existing, receiving NEW, & lengths dont match)
+    if (
+      this.scroller &&
+      this.scroller.scrollTop < 100 &&
+      this.props.data.messages &&
+      messages &&
+      this.props.data.messages.length !== messages.length
+    ) {
+      // 35 items, but new ones haven't yet rendered
+      const heightBeforeRender = this.scroller.scrollHeight;
+      // wait for 70 items (or more) to render
+      setTimeout(() => {
+        this.scroller.scrollTop = this.scroller.scrollHeight - heightBeforeRender;
+        this.setState({ reachedTop: false });
+      }, 150);
     }
   }
 
@@ -97,68 +119,79 @@ class MessageContainer extends Component {
       },
     });
 
+  handleScroll = () => {
+    const { data: { messages, fetchMore }, channelId } = this.props;
+    if (
+      !this.state.reachedTop &&
+      this.scroller &&
+      this.scroller.scrollTop < 100 &&
+      this.state.hasMoreItems &&
+      messages.length >= 35
+    ) {
+      console.log('Reached Top');
+      this.setState({ reachedTop: true });
+      fetchMore({
+        variables: {
+          channelId, // keep same channelId
+          cursor: messages[messages.length - 1].created_at, // date of last message
+        },
+        // Takes previousResult, what we fetched, and combines them together
+        updateQuery: (previousResult, { fetchMoreResult }) => {
+          if (!fetchMoreResult) {
+            return previousResult;
+          }
+
+          if (fetchMoreResult.messages.length < 35) {
+            // Reached end of list ex 35 35 23 0 0 0
+            this.setState({ hasMoreItems: false });
+          }
+
+          return {
+            ...previousResult,
+            messages: [...previousResult.messages, ...fetchMoreResult.messages],
+          };
+        },
+      });
+    }
+  }
+
   render() {
-    const { data: { messages, fetchMore, loading }, channelId } = this.props;
+    const { data: { messages, loading }, channelId } = this.props;
     return loading ? null : (
-
-      <FileUpload
-        style={localStyle.fileUpload}
-        channelId={channelId}
-        disableClick
+      <div
+        style={localStyle.wrapper}
+        ref={(scroller) => {
+          this.scroller = scroller;
+        }}
+        onScroll={this.handleScroll}
       >
-        <Comment.Group>
-          {this.state.hasMoreItems &&
-            messages.length >= 35 && (
-              <Button
-                onClick={() => {
-                  // Use Apollo's fetchmore function & change the offset
-                  fetchMore({
-                    variables: {
-                      channelId, // keep same channelId
-                      cursor: messages[messages.length - 1].created_at, // date of last message
-                    },
-                    // Takes previousResult, what we fetched, and combines them together
-                    updateQuery: (previousResult, { fetchMoreResult }) => {
-                      if (!fetchMoreResult) {
-                        return previousResult;
-                      }
-
-                      if (fetchMoreResult.messages.length < 35) {
-                        // Reached end of list ex 35 35 23 0 0 0
-                        this.setState({ hasMoreItems: false });
-                      }
-
-                      return {
-                        ...previousResult,
-                        messages: [...previousResult.messages, ...fetchMoreResult.messages],
-                      };
-                    },
-                  });
-                }}
-              >
-                Load More
-              </Button>
-          )}
-          {messages
-            .slice()
-            .reverse()
-            .map(m => (
-              <Comment key={`message-${m.id}`}>
-                {/* <Comment.Avatar src="" /> */}
-                <Comment.Content>
-                  <Comment.Author as="a">{ m.user.username }</Comment.Author>
-                  <Comment.Metadata>
-                    <div>{ m.created_at }</div>
-                  </Comment.Metadata>
-                  <Message message={m} />
-                  <Comment.Actions>
-                    <Comment.Action>Reply</Comment.Action>
-                  </Comment.Actions>
-                </Comment.Content>
-              </Comment>
-            ))}
-        </Comment.Group>
-      </FileUpload>
+        <FileUpload
+          style={localStyle.fileUpload}
+          channelId={channelId}
+          disableClick
+        >
+          <Comment.Group>
+            {messages
+              .slice()
+              .reverse()
+              .map(m => (
+                <Comment key={`message-${m.id}`}>
+                  {/* <Comment.Avatar src="" /> */}
+                  <Comment.Content>
+                    <Comment.Author as="a">{ m.user.username }</Comment.Author>
+                    <Comment.Metadata>
+                      <div>{ m.created_at }</div>
+                    </Comment.Metadata>
+                    <Message message={m} />
+                    <Comment.Actions>
+                      <Comment.Action>Reply</Comment.Action>
+                    </Comment.Actions>
+                  </Comment.Content>
+                </Comment>
+              ))}
+          </Comment.Group>
+        </FileUpload>
+      </div>
     );
   }
 }
