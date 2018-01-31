@@ -16,7 +16,8 @@ const ViewTeam = ({
   data: { loading, me },
   match: { params: { teamId, channelId } },
 }) => {
-  if (loading) {
+  if (loading || !me) {
+    // me was getting undefined for a split sec on page switches - quick fix
     return null;
   }
 
