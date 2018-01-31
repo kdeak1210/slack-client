@@ -87,9 +87,11 @@ class MessageContainer extends Component {
       const heightBeforeRender = this.scroller.scrollHeight;
       // wait for 70 items (or more) to render
       setTimeout(() => {
-        this.scroller.scrollTop = this.scroller.scrollHeight - heightBeforeRender;
-        this.setState({ reachedTop: false });
-      }, 150);
+        if (this.scroller) {
+          this.scroller.scrollTop = this.scroller.scrollHeight - heightBeforeRender;
+          this.setState({ reachedTop: false });
+        }
+      }, 100);
     }
   }
 
