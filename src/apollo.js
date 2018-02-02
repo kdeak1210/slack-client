@@ -8,7 +8,7 @@ import { createUploadLink } from 'apollo-upload-client';
 
 // Builds on createHttpLink, adds file uploading capability
 const httpLink = createUploadLink({
-  uri: 'http://localhost:8080/graphql',
+  uri: `http://${process.env.REACT_APP_SERVER_HOST_URL}/graphql`,
 });
 
 // Middleware runs before every gql request (add headers to context)
@@ -44,7 +44,7 @@ const afterwareLink = new ApolloLink((operation, forward) =>
 const httpLinkWithMiddleware = afterwareLink.concat(middlewareLink.concat(httpLink));
 
 export const wsLink = new WebSocketLink({
-  uri: 'ws://localhost:8080/subscriptions',
+  uri: `ws://${process.env.REACT_APP_SERVER_HOST_URL}/subscriptions`,
   options: {
     reconnect: true,
     lazy: true,

@@ -78,7 +78,7 @@ class MessageContainer extends Component {
     // check for new messages (have existing, receiving NEW, & lengths dont match)
     if (
       this.scroller &&
-      this.scroller.scrollTop < 100 &&
+      this.scroller.scrollTop < 20 &&
       this.props.data.messages &&
       messages &&
       this.props.data.messages.length !== messages.length
