@@ -40,6 +40,7 @@ const localStyle = {
 const Message = ({ message: { url, text, mimetype } }) => {
   if (url) {
     if (mimetype.startsWith('image/')) {
+      console.log(url);
       return <img src={url} alt="Uploaded File" />;
     } else if (mimetype === 'text/plain') {
       return <RenderText url={url} />;
