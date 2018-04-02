@@ -4,6 +4,7 @@ import { observer } from 'mobx-react';
 import { Button, Container, Form, Header, Input, Message } from 'semantic-ui-react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import { Link } from 'react-router-dom';
 
 import { wsLink } from '../apollo';
 
@@ -90,6 +91,16 @@ class Login extends Component {
           ? <Message error header="Please fix the following form error(s): " list={errorList} />
           : null
         }
+        <Header as="h4">
+          <Link to="/register">Go To Register</Link>
+        </Header>
+        <Message>
+          <Message.Header>
+            Or use these test credentials
+          </Message.Header>
+          <p>user@email.com</p>
+          <p>12345</p>
+        </Message>
       </Container>
     );
   }

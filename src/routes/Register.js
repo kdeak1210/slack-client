@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Button, Container, Form, Header, Input, Message } from 'semantic-ui-react';
 import { graphql } from 'react-apollo';
 import gql from 'graphql-tag';
+import { Link } from 'react-router-dom';
 
 class Register extends Component {
   state = {
@@ -101,6 +102,9 @@ class Register extends Component {
           ? <Message error header="Please fix the following form error(s): " list={errorList} />
           : null
         }
+        <Header as="h4">
+          <Link to="/login">Go To Login</Link>
+        </Header>
       </Container>
     );
   }
